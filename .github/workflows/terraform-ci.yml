@@ -1,0 +1,46 @@
+name: Terraform CI
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  terraform-ci:
+    name: Terraform CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: environment/dev
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Terraform Version
+        run: terraform version
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="terraform.tfvars"
